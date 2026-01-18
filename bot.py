@@ -1353,7 +1353,7 @@ def lyrics_cmd(message):
             bot.reply_to(message, "⚠️ Failed to send lyrics. They might be too long.")
     else:
         bot.reply_to(message, f"❌ Lyrics not found for {artist} - {title}")
-        
+
 # ------------------- NEW CHAT MEMBERS ------------------- #
 @bot.message_handler(content_types=['new_chat_members'])
 def welcome_new_members(message):
@@ -1455,19 +1455,35 @@ def group_link_moderation(message):
             bot.send_message(chat_id, f"🚫 @{message.from_user.username} has been muted for 24 hours for posting links!")
             chat_warnings[user_id] = 0
 
+
 # ---------------- RUN ---------------- #
+import threading
+from flask import Flask
+import os
+
 print("🚀 Collins AI running...")
 
-while True:
-    try:
-        bot.polling(non_stop=True, timeout=60)
-    except Exception as e:
-        print(f"⚠ Bot crashed: {e}")
-        print("⏳ Restarting in 5s...")
-        print("Muhahahahaha...")
-        time.sleep(5)
+# --- Telegram bot polling in a thread ---
+def run_bot():
+    while True:
+        try:
+            bot.polling(non_stop=True, timeout=60)
+        except Exception as e:
+            print(f"⚠ Bot crashed: {e}")
+            print("⏳ Restarting in 5s...")
+            print("Muhahahahaha...")
+            time.sleep(5)
 
+threading.Thread(target=run_bot).start()
 
+# --- Dummy Flask server for Render free tier ---
+app = Flask(__name__)
 
+@app.route("/")
+def index():
+    return "Collins AI bot is running 🚀"
+
+port = int(os.environ.get("PORT", 10000))  # Render assigns PORT automatically
+app.run(host="0.0.0.0", port=port)
 
 
