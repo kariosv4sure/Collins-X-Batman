@@ -1,0 +1,266 @@
+{
+    "8153349947": {
+        "characters": [
+            {
+                "name": "Meliodas",
+                "verse": "Seven Deadly Sins",
+                "level": 21,
+                "rarity": "Rare",
+                "stats": {
+                    "attack": 44,
+                    "speed": 32,
+                    "chakra": 31
+                }
+            },
+            {
+                "name": "Shikamaru Nara",
+                "verse": "Naruto",
+                "level": 19,
+                "rarity": "Rare",
+                "stats": {
+                    "attack": 51,
+                    "speed": 33,
+                    "chakra": 45
+                }
+            },
+            {
+                "name": "Merlin",
+                "verse": "Seven Deadly Sins",
+                "level": 19,
+                "rarity": "Legendary",
+                "stats": {
+                    "attack": 44,
+                    "speed": 48,
+                    "chakra": 47
+                }
+            },
+            {
+                "name": "Hinata Hyuga",
+                "verse": "Naruto",
+                "level": 11,
+                "rarity": "Rare",
+                "stats": {
+                    "attack": 43,
+                    "speed": 57,
+                    "chakra": 33
+                }
+            }
+        ],
+        "last_train": 0
+    },
+    "6867823491": {
+        "characters": [
+            {
+                "name": "Diane",
+                "verse": "Seven Deadly Sins",
+                "level": 11,
+                "rarity": "Rare",
+                "stats": {
+                    "attack": 37,
+                    "speed": 48,
+                    "chakra": 56
+                }
+            },
+            {
+                "name": "Itachi Uchiha",
+                "verse": "Naruto",
+                "level": 7,
+                "rarity": "Rare",
+                "stats": {
+                    "attack": 48,
+                    "speed": 57,
+                    "chakra": 32
+                }
+            },
+            {
+                "name": "Tsunade",
+                "verse": "Naruto",
+                "level": 7,
+                "rarity": "Rare",
+                "stats": {
+                    "attack": 52,
+                    "speed": 32,
+                    "chakra": 46
+                }
+            },
+            {
+                "name": "Majin Buu",
+                "verse": "DBZ",
+                "level": 1,
+                "rarity": "Common",
+                "stats": {
+                    "attack": 35,
+                    "speed": 47,
+                    "chakra": 49
+                }
+            }
+        ],
+        "last_train": 0
+    },
+    "7392550842": {
+        "characters": [
+            {
+                "name": "Rock Lee",
+                "verse": "Naruto",
+                "level": 3,
+                "rarity": "Common",
+                "stats": {
+                    "attack": 48,
+                    "speed": 58,
+                    "chakra": 55
+                }
+            },
+            {
+                "name": "Naruto Uzumaki",
+                "verse": "Naruto",
+                "level": 1,
+                "rarity": "Common",
+                "stats": {
+                    "attack": 39,
+                    "speed": 58,
+                    "chakra": 57
+                }
+            }
+        ],
+        "last_train": 0
+    },
+    "7985693205": {
+        "characters": [],
+        "last_train": 0
+    },
+    "8425242802": {
+        "characters": [
+            {
+                "name": "Gaara",
+                "verse": "Naruto",
+                "level": 3,
+                "rarity": "Common",
+                "stats": {
+                    "attack": 54,
+                    "speed": 38,
+                    "chakra": 36
+                }
+            },
+            {
+                "name": "Naruto Uzumaki",
+                "verse": "Naruto",
+                "level": 1,
+                "rarity": "Common",
+                "stats": {
+                    "attack": 48,
+                    "speed": 50,
+                    "chakra": 60
+                }
+            },
+            {
+                "name": "Kakashi Hatake",
+                "verse": "Naruto",
+                "level": 1,
+                "rarity": "Common",
+                "stats": {
+                    "attack": 57,
+                    "speed": 50,
+                    "chakra": 38
+                }
+            },
+            {
+                "name": "Sasuke Uchiha",
+                "verse": "Naruto",
+                "level": 1,
+                "rarity": "Common",
+                "stats": {
+                    "attack": 46,
+                    "speed": 56,
+                    "chakra": 47
+                }
+            }
+        ],
+        "last_train": 0
+    },
+    "7171877265": {
+        "characters": [],
+        "last_train": 0
+    },
+    "7412895808": {
+        "characters": [
+            {
+                "name": "Goku",
+                "verse": "DBZ",
+                "level": 3,
+                "rarity": "Common",
+                "stats": {
+                    "attack": 46,
+                    "speed": 41,
+                    "chakra": 42
+                }
+            },
+            {
+                "name": "Naruto Uzumaki",
+                "verse": "Naruto",
+                "level": 3,
+                "rarity": "Rare",
+                "stats": {
+                    "attack": 45,
+                    "speed": 55,
+                    "chakra": 34
+                }
+            },
+            {
+                "name": "Sanji",
+                "verse": "One Piece",
+                "level": 3,
+                "rarity": "Rare",
+                "stats": {
+                    "attack": 39,
+                    "speed": 35,
+                    "chakra": 31
+                }
+            },
+            {
+                "name": "Uryu Ishida",
+                "verse": "Bleach",
+                "level": 3,
+                "rarity": "Legendary",
+                "stats": {
+                    "attack": 37,
+                    "speed": 30,
+                    "chakra": 40
+                }
+            },
+            {
+                "name": "Meliodas",
+                "verse": "Seven Deadly Sins",
+                "level": 3,
+                "rarity": "Common",
+                "stats": {
+                    "attack": 51,
+                    "speed": 50,
+                    "chakra": 33
+                }
+            },
+            {
+                "name": "Charmy",
+                "verse": "Black Clover",
+                "level": 3,
+                "rarity": "Common",
+                "stats": {
+                    "attack": 30,
+                    "speed": 51,
+                    "chakra": 34
+                }
+            },
+            {
+                "name": "Piccolo",
+                "verse": "DBZ",
+                "level": 1,
+                "rarity": "Rare",
+                "stats": {
+                    "attack": 58,
+                    "speed": 56,
+                    "chakra": 53
+                }
+            }
+        ],
+        "last_train": 0
+    }
+}
