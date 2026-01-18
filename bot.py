@@ -14,7 +14,6 @@ from dotenv import load_dotenv
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from deep_translator import GoogleTranslator
-from youtubesearchpython import VideosSearch
 
 
 START_TIME = time.time()  # bot start time
