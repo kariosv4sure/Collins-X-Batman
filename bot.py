@@ -299,6 +299,24 @@ def check_banned_callback(func):
         return func(call, *args, **kwargs)
     return wrapper
 
+import time
+
+# In your user data
+# referrals_data[user_id] = {"referrals": [], "coins": 0, "last_ai_reward": 0}
+
+AI_REWARD = 5
+AI_COOLDOWN = 12 * 60 * 60  # 12 hours
+
+def give_ai_reward(uid):
+    now = time.time()
+    user_data = referrals_data.setdefault(uid, {"referrals": [], "coins": 0, "last_ai_reward": 0})
+
+    if now - user_data.get("last_ai_reward", 0) >= AI_COOLDOWN:
+        user_data["coins"] += AI_REWARD
+        user_data["last_ai_reward"] = now
+        bot.send_message(uid, f"🤖 Thanks for chatting!\n+{AI_REWARD} coins earned (once every 12hrs)")
+        save_referrals()
+
 # ----------------- BAN USER ----------------- #
 @bot.message_handler(commands=['ban'])
 def ban_user(message):
@@ -565,12 +583,12 @@ def refinfo_cmd(message):
         "2️⃣ Each friend who starts the bot with your link = 1 Referral\n"
         "3️⃣ Each referral = 5 coins\n"
         "4️⃣ Track your referrals & coins anytime: /referrals\n"
-        "5️⃣ Convert coins to cash or VIP features: /convert\n\n"
+        "5️⃣ Convert coins to cash or VIP features: /convert\n"
+        "6️⃣ See the top referrers: /refleaderboard\n\n"
         "💡 T&C: 100 coins = Access to VIP features or #100\n"
         "Keep sharing and watch your coins grow! 😎",
         parse_mode="Markdown"
     )
-
 
 @bot.message_handler(commands=['refer'])
 @check_banned_user
@@ -653,20 +671,31 @@ def convert_cmd(message):
 @bot.message_handler(commands=['refleaderboard'])
 @check_banned_user
 def ref_leaderboard(message):
-    """Shows top 10 referrers"""
-    if not referrals_data:
+    """Shows top referrers (ignores users with 0 coins)"""
+    # Filter out users with 0 coins
+    active_refs = {uid: data for uid, data in referrals_data.items() if data["coins"] > 0}
+
+    if not active_refs:
         bot.send_message(message.chat.id, "No referrals yet 😅 Start sharing your link!")
         return
 
-    top = sorted(referrals_data.items(), key=lambda x: x[1]["coins"], reverse=True)[:10]
+    # Sort top 10
+    top = sorted(active_refs.items(), key=lambda x: x[1]["coins"], reverse=True)[:10]
+
     text = "🏅 *TOP REFERRERS* 🏅\n\n"
 
     for i, (uid, data) in enumerate(top, 1):
-        text += f"{i}. User {uid} — {data['coins']} coins — {len(data['referrals'])} refs\n"
+        try:
+            user_obj = bot.get_chat(uid)
+            username = f"@{user_obj.username}" if user_obj.username else user_obj.first_name
+        except Exception:
+            username = f"User {uid}"  # fallback
+
+        text += f"{i}. {username} — {data['coins']} coins — {len(data['referrals'])} refs\n"
 
     bot.send_message(message.chat.id, text, parse_mode="Markdown")
 
-# ------------------- HELP COMMAND ------------------- #
+# ------------------- HELP COMMAND -------------------
 @bot.message_handler(commands=['help'])
 @check_banned_user
 def help_cmd(message):
@@ -716,10 +745,11 @@ def help_cmd(message):
         InlineKeyboardButton("🎵 Lyrics", callback_data="help_lyrics")
     )
 
-    # Profile & Leaderboards
+    # Profile, Leaderboards & Referral
     markup.add(
         InlineKeyboardButton("👤 Profile", callback_data="help_profile"),
-        InlineKeyboardButton("🏆 Leaderboard", callback_data="help_leaderboard")
+        InlineKeyboardButton("🏆 Leaderboard", callback_data="help_leaderboard"),
+        InlineKeyboardButton("🎯 Referral System", callback_data="help_referral")
     )
 
     # Tools
@@ -746,7 +776,7 @@ def help_cmd(message):
     )
 
 
-# ------------------- HELP CALLBACKS ------------------- #
+# ------------------- HELP CALLBACKS -------------------
 HELP_RESPONSES = {
     "fun": "😂 Joke: /joke\n✂️ RPS: /rps <rock|paper|scissors>",
     "fun_rps": "Usage: /rps <rock|paper|scissors>",
@@ -758,6 +788,7 @@ HELP_RESPONSES = {
     "lyrics": "Send artist - title like /lyrics Rustage - Kurama",
     "profile": None,  # dynamic
     "leaderboard": None,  # calls leaderboard function
+    "referral": None,  # handled inline
     "remind": "Set a reminder using /remind <minutes> <text>",
     "anime": "🎴 *Anime Characters System*\n"
              "• /search <verse> → Search & recruit a character\n"
@@ -792,12 +823,37 @@ def help_callback(call):
             f"💬 Messages: {data['messages']}\n"
             f"⌨ Commands: {data['commands']}"
         )
+
     elif category == "leaderboard":
         leaderboard(call.message)
+
+    elif category == "referral":
+        # INLINE MENU FOR REFERRAL SYSTEM
+        data = referrals_data.get(uid, {"referrals": [], "coins": 0})
+        link = f"https://t.me/Collins_X_Batman_bot?start={uid}"
+
+        markup = InlineKeyboardMarkup(row_width=1)
+        markup.add(
+            InlineKeyboardButton("📤 My Referral Link", url=f"https://t.me/share/url?url={link}"),
+            InlineKeyboardButton("📊 My Referral Stats", callback_data="ref_stats"),
+            InlineKeyboardButton("🏅 Top Referrers", callback_data="ref_leaderboard")
+        )
+
+        bot.send_message(
+            chat_id,
+            f"🎯 *Referral System*\n\n"
+            f"Share your link, earn coins, and track your progress!\n\n"
+            f"Your link: {link}\nCoins: {data['coins']}\nReferrals: {len(data['referrals'])}",
+            reply_markup=markup,
+            parse_mode="Markdown"
+        )
+
     elif category == "about":
         about(call.message)
+
     elif category == "support":
         support(call.message)
+
     else:
         bot.send_message(chat_id, response, parse_mode="Markdown")
 
@@ -806,27 +862,68 @@ def help_callback(call):
     except Exception:
         pass
 
-@bot.callback_query_handler(func=lambda call: call.data=="ref_stats")
-@check_banned_callback
-def ref_stats_btn(call):
-    uid = str(call.from_user.id)
-    data = referrals_data.get(uid,{"referrals":[],"coins":0})
+# ---------------- PROFILE COMMAND ---------------- #
+@bot.message_handler(commands=['profile'])
+@check_banned_user
+def profile(message):
+    user = message.from_user.username
+    uid = str(message.from_user.id)
 
-    bot.answer_callback_query(call.id)
-    bot.send_message(
-        call.message.chat.id,
-        f"📊 *Your Stats*\n\n"
-        f"👥 Referrals: {len(data['referrals'])}\n"
-        f"💰 Coins: {data['coins']}",
-        parse_mode="Markdown"
+    ensure_user(user)
+    level = get_level(xp_data[user]["xp"])
+    coins = referrals_data.get(uid, {"coins": 0})["coins"]
+
+    markup = InlineKeyboardMarkup()
+    markup.add(
+        InlineKeyboardButton("🛒 Shop", callback_data="open_shop"),
+        InlineKeyboardButton("🎯 Refer", callback_data="open_refer")
     )
 
-@bot.callback_query_handler(func=lambda call: call.data in ["open_shop","open_refer"])
+    bot.send_message(
+        message.chat.id,
+        f"👤 @{user}\n"
+        f"⭐ Level: {level}\n"
+        f"⚡ XP: {xp_data[user]['xp']}\n"
+        f"💰 Coins: {coins}",
+        reply_markup=markup
+    )
+
+# ---------------- PROFILE BUTTON CALLBACK ---------------- #
+@bot.callback_query_handler(func=lambda call: call.data in ["open_shop", "open_refer", "ref_stats"])
+@check_banned_callback
 def profile_buttons(call):
-    if call.data=="open_shop":
-        shop_cmd(call.message)
-    else:
-        refer_cmd(call.message)
+    uid = str(call.from_user.id)  # 🔑 always use the user clicking the button
+    user = call.from_user.username
+    data = referrals_data.get(uid, {"referrals": [], "coins": 0})
+
+    if call.data == "open_refer":
+        link = f"https://t.me/Collins_X_Batman_bot?start={uid}"
+        markup = InlineKeyboardMarkup()
+        markup.add(
+            InlineKeyboardButton("📤 Share Link", url=f"https://t.me/share/url?url={link}"),
+            InlineKeyboardButton("📊 My Stats", callback_data="ref_stats")
+        )
+        bot.send_message(
+            call.message.chat.id,
+            f"🎯 Your Referral Link\n{link}\nEarn 5 coins per invite 😎",
+            reply_markup=markup
+        )
+
+    elif call.data == "ref_stats":
+        bot.send_message(
+            call.message.chat.id,
+            f"📊 Your Stats\n\n👥 Referrals: {len(data['referrals'])}\n💰 Coins: {data['coins']}"
+        )
+
+    elif call.data == "open_shop":
+        shop_cmd(call.message)  # your existing shop function
+
+    bot.answer_callback_query(call.id)
+
+    elif call.data == "open_shop":
+        bot.send_message(call.message.chat.id, "🛒 Shop coming soon! Stay tuned 😎")
+
+    bot.answer_callback_query(call.id)
 
 @bot.message_handler(commands=["about"])
 @check_banned_user
@@ -881,31 +978,6 @@ def summarize(message):
     add_command_xp(message.from_user.username)
     summarize_mode[message.from_user.username] = True
     bot.reply_to(message, "Send text to summarize")
-
-@bot.message_handler(commands=['profile'])
-@check_banned_user
-def profile(message):
-    user = message.from_user.username
-    uid = str(message.from_user.id)
-
-    ensure_user(user)
-    level = get_level(xp_data[user]["xp"])
-    coins = referrals_data.get(uid,{"coins":0})["coins"]
-
-    markup = InlineKeyboardMarkup()
-    markup.add(
-        InlineKeyboardButton("🛒 Shop", callback_data="open_shop"),
-        InlineKeyboardButton("🎯 Refer", callback_data="open_refer")
-    )
-
-    bot.send_message(
-        message.chat.id,
-        f"👤 @{user}\n"
-        f"⭐ Level: {level}\n"
-        f"⚡ XP: {xp_data[user]['xp']}\n"
-        f"💰 Coins: {coins}",
-        reply_markup=markup
-    )
 
 # 🏆 leaderboard without banned
 @bot.message_handler(commands=['leaderboard'])
@@ -1280,7 +1352,7 @@ def rps_game(message):
     except:
         bot.reply_to(message,"Usage: /rps <rock|paper|scissors>")
 
-# ---------------- AZLYRICS FETCHER ---------------- #
+# ---------------- AZLYRICS FETCHER FIX ---------------- #
 def fetch_azlyrics(artist: str, title: str) -> Optional[str]:
     """
     Scrapes AZLyrics for given artist and title.
@@ -1304,12 +1376,19 @@ def fetch_azlyrics(artist: str, title: str) -> Optional[str]:
             return None
 
         soup = BeautifulSoup(res.text, "html.parser")
-        # Lyrics divs have no class or id
-        divs = soup.find_all("div", class_=None, id=None)
-        if not divs:
+
+        # Lyrics div is after <div class="ringtone">, no class/id itself
+        divs = soup.find_all("div")
+        lyrics_div = None
+        for i, div in enumerate(divs):
+            if 'class' in div.attrs and div['class'] == ['ringtone']:
+                lyrics_div = divs[i + 1]
+                break
+
+        if not lyrics_div:
             return None
 
-        lyrics = divs[0].get_text(strip=True, separator="\n")
+        lyrics = lyrics_div.get_text(strip=True, separator="\n")
         return lyrics
 
     except Exception as e:
