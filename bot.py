@@ -667,12 +667,11 @@ def convert_cmd(message):
             parse_mode="Markdown"
         )
 
-
 @bot.message_handler(commands=['refleaderboard'])
 @check_banned_user
 def ref_leaderboard(message):
     """Shows top referrers (ignores users with 0 coins)"""
-    # Filter out users with 0 coins
+    # Filter out users with >0 coins
     active_refs = {uid: data for uid, data in referrals_data.items() if data["coins"] > 0}
 
     if not active_refs:
@@ -686,7 +685,7 @@ def ref_leaderboard(message):
 
     for i, (uid, data) in enumerate(top, 1):
         try:
-            user_obj = bot.get_chat(uid)
+            user_obj = bot.get_chat(int(uid))  # ✅ convert to int
             username = f"@{user_obj.username}" if user_obj.username else user_obj.first_name
         except Exception:
             username = f"User {uid}"  # fallback
