@@ -916,11 +916,6 @@ def profile_buttons(call):
         )
 
     elif call.data == "open_shop":
-        shop_cmd(call.message)  # your existing shop function
-
-    bot.answer_callback_query(call.id)
-
-    elif call.data == "open_shop":
         bot.send_message(call.message.chat.id, "🛒 Shop coming soon! Stay tuned 😎")
 
     bot.answer_callback_query(call.id)
